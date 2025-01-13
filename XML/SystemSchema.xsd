@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+	<!-- Root Element -->
+	<xs:element name="Applications">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Application" type="ApplicationType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- Global Element Declarations -->
+	<xs:element name="Application" type="ApplicationType"/>
+	<xs:element name="Container" type="ContainerType"/>
+	<xs:element name="Record" type="RecordType"/>
+	<xs:element name="Notification" type="NotificationType"/>
+
+	<!-- Application Type Definition -->
+	<xs:complexType name="ApplicationType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="creation_datetime" type="xs:dateTime" minOccurs = '0' />
+			<xs:element name="Containers" minOccurs = '0'>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Container" type="ContainerType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:positiveInteger" use="optional"/>
+	</xs:complexType>
+
+	<!-- Container Type Definition -->
+	<xs:complexType name="ContainerType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="creation_datetime" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="parent" type="xs:positiveInteger" minOccurs="0"/>
+
+			<xs:element name="Records" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Record" type="RecordType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="Notifications" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Notification" type="NotificationType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:positiveInteger" use="optional"/>
+	</xs:complexType>
+
+	<!-- Rest of the schema remains the same as in the previous version -->
+	<!-- Record Type Definition -->
+	<xs:complexType name="RecordType">
+		<xs:all>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="content" type="xs:string"/>
+			<xs:element name="creation_datetime" type="xs:dateTime" minOccurs="0" />
+			<xs:element name="parent" type="xs:positiveInteger" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="id" type="xs:positiveInteger" use="optional"/>
+	</xs:complexType>
+
+	<!-- Notification Type Definition -->
+	<xs:complexType name="NotificationType">
+		<xs:all>
+			<xs:element name="name" type="xs:string" minOccurs="1"/>
+			<xs:element name="creation_datetime" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="parent" type="xs:positiveInteger" minOccurs="0"/>
+			<xs:element name="event" type="EventType"/>
+			<xs:element name="endpoint" type="EndpointType"/>
+			<xs:element name="enabled" type="xs:boolean"/>
+		</xs:all>
+		<xs:attribute name="id" type="xs:positiveInteger" use="optional"/>
+	</xs:complexType>
+
+	<!-- Event Type (Restricted to Creation/Deletion) -->
+	<xs:simpleType name="EventType">
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="1"/>
+			<!-- Creation -->
+			<xs:enumeration value="2"/>
+			<!-- Deletion -->
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Endpoint Type (Supporting both MQTT and HTTP) -->
+	<xs:simpleType name="EndpointType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(mqtt://|http://).*"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
